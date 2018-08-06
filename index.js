@@ -6,5 +6,5 @@ app.get("/", () => {
     res.send({ hi: "there" });
 });
 
-const PORT = precess.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT);
