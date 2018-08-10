@@ -4,7 +4,7 @@ module.exports = app => {
     app.get(
         "/auth/google",
         passport.authenticate("google", {
-            scope: ["profile", "email"]
+            scope: ["profile", "email", "name"]
         })
     );
 
@@ -17,5 +17,9 @@ module.exports = app => {
     app.get("/api/logout", (req, res) => {
         req.logout();
         res.send(req.user || "There's no user signed in");
+    });
+
+    app.get("/xobiespato", (req, res) => {
+        res.send(req.user.get("name") + " es patooooo");
     });
 };
