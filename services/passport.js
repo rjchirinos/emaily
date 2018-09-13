@@ -7,35 +7,31 @@ const User = mongoose.model("users");
 
 // Create a cookie/token for the user signed in
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+  done(null, user.id);
 });
 
 // Pull back the token from the user
 passport.deserializeUser((id, done) => {
-    User.findById(id).then(user => {
-        done(null, user);
-    });
+  User.findById(id).then(user => {
+    done(null, user);
+  });
 });
 
 passport.use(
-    new GoogleStrategy(
-        {
-            clientID: keys.googleClientID,
-            clientSecret: keys.googleClientSecret,
-            callbackURL: "/auth/google/callback"
-        },
-        (accessToken, refreshToken, profile, done) => {
-            User.findOne({ googleID: profile.id }).then(existingUser => {
-                if (existingUser) {
-                    done(null, existingUser);
-                } else {
-                    new User({
-                        googleID: profile.id
-                    })
-                        .save()
-                        .then(user => done(null, existingUser));
-                }
-            });
-        }
-    )
+  new GoogleStrategy(
+    {
+      clientID: keys.googleClientID,
+      clientSecret: keys.googleClientSecret,
+      callbackURL: "/auth/google/callback",
+      proxy: true
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      const existingUser = await User.findOne({ googleID: profile.id });
+      if (existingUser) {
+        done(null, existingUser);
+      }
+      const user = await new User({ googleID: profile.id }).save();
+      done(null, user);
+    }
+  )
 );
